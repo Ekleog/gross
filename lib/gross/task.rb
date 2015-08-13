@@ -14,11 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
-require './lib/gross.rb'
-require 'test/unit'
+module Gross
+private
+    class Task
+        def initialize(up, down)
+            @up = up
+            @down = down
+        end
 
-class TestWorld < Test::Unit::TestCase
-    def test_test
-        assert_equal(42, Gross.test(6, 7))
+        def up()
+            @up.call
+        end
+
+        def down()
+            @down.call
+        end
     end
 end

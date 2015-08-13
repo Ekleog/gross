@@ -14,20 +14,33 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'gross'
+require 'minitest/spec'
+require 'minitest/autorun'
 
-Gem::Specification.new do |spec|
-    spec.name          = 'gross'
-    spec.version       = Gross::VERSION
-    spec.date          = DateTime.now.strftime '%F'
-    spec.summary       = %q{A DSL for backtracking-based programs and network configuration}
-    spec.description   = File.read('README.rdoc')
-    spec.authors       = ['Leo Gaspard']
-    spec.email         = 'leo@gaspard.io'
-    spec.files         = Dir['lib/gross{,/*}.rb']
-    spec.test_files    = Dir['tests/test_*']
-    spec.homepage      = 'https://github.com/Ekleog/gross'
-    spec.license       = 'GPLv3'
+class TestTaskPrintln < MiniTest::Unit::TestCase
+    def do_test(msg)
+        g = Gross::Machine.new
+        g.println(msg)
+        g.die()
+        assert_output("#{msg}\n", '') do
+            begin
+                g.run()
+            rescue
+            end
+        end
+    end
+
+    def test_basic
+        do_test 'Hello World!'
+        do_test 'Goodbye everyone...'
+    end
+
+    def test_empty
+        do_test ''
+    end
+
+    def test_long
+        do_test 'A' * 10000
+    end
 end

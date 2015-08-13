@@ -14,9 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
-module Gross
-    VERSION = '0.0.1'
-end
-
 require 'gross/task'
-require 'gross/machine'
+
+module Gross
+    class Machine
+        def initialize()
+            @tasks = []
+        end
+
+        def run()
+            @tasks.each do |t|
+                t.up()
+            end
+        end
+
+        def println(msg)
+            @tasks << Task.new(lambda { puts msg }, lambda {})
+        end
+
+        def die()
+            @tasks << Task.new(lambda { raise 'dying' }, lambda {})
+        end
+    end
+end
