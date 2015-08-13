@@ -1,0 +1,14 @@
+== Gross
+
+Gross was initially designed for network configuration. However, doing so turned
+out to be equivalent to implementing a light Domain Specific Language, entirely
+in Ruby.
+
+This DSL is entirely based on the notion of backtracking: it successively runs
+commands, and in case any command in the already-started commands fails, all the
+dependent commands are deactivated and the failed command is started anew. If a
+command fails to initialize, it switches to the next non-dependent command and
+runs it ; until it manages to initialize the previously failed command.
+
+This may sound hard to understand, but it is just under-the-hood management: you
+usually will just write declarative scripts and it will Just Work (TM).
