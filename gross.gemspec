@@ -14,12 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-
 Gem::Specification.new do |spec|
     spec.name          = 'gross'
-    spec.version       = '0.1'
+    spec.version       = '0.0.1'
     spec.date          = DateTime.now.strftime '%F'
     spec.summary       = %q{A DSL for backtracking-based programs and network configuration}
     spec.description   = File.read('README.rdoc')
