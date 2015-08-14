@@ -22,18 +22,38 @@ module Gross
             @tasks = []
         end
 
+        def add_task(up: lambda {}, down: lambda {})
+            new_task = Task.new(@tasks.length, up, down)
+            @tasks << new_task
+            return new_task
+        end
+
         def run()
             @tasks.each do |t|
                 t.up()
             end
         end
 
+        def rewind(id)
+            @tasks[id..-1].reverse.each do |t|
+                t.down()
+            end
+        end
+
         def println(msg)
-            @tasks << Task.new(lambda { puts msg }, lambda {})
+            add_task(up: lambda { puts msg }, down: lambda {})
+        end
+
+        def rprintln(msg)
+            add_task(up: lambda {}, down: lambda { puts msg })
+        end
+
+        def blocker()
+            add_task(up: lambda {}, down: lambda {})
         end
 
         def die()
-            @tasks << Task.new(lambda { raise 'dying' }, lambda {})
+            add_task(up: lambda { raise 'dying' }, down: lambda {})
         end
     end
 end

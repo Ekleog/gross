@@ -14,23 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
-module Gross
-private
-    class Task
-        def initialize(id, up, down)
-            @id = id
-            @up = up
-            @down = down
-        end
+require 'gross'
+require 'minitest/spec'
+require 'minitest/autorun'
 
-        attr_reader :id
-
-        def up()
-            @up.call
-        end
-
-        def down()
-            @down.call
-        end
+class TestTaskBlocker < MiniTest::Test
+    def test_basic
+        g = Gross::Machine.new
+        blk = g.blocker
+        g.println("UP")
+        g.rprintln("DOWN")
+        assert_output("UP\n", '') { g.run }
+        assert_output("DOWN\n", '') { g.rewind(blk.id) }
     end
 end
