@@ -34,9 +34,17 @@ module Gross
             end
         end
 
-        def rewind(id)
-            @tasks[id..-1].reverse.each do |t|
-                t.down()
+        def down(id)
+            tasks = [id]
+            while !tasks.empty? do
+                next_tasks = []
+                tasks.each do |t|
+                    if @tasks[t].up?
+                        next_tasks += @tasks[t].rdeps
+                        @tasks[t].down
+                    end
+                end
+                tasks = next_tasks
             end
         end
 

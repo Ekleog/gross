@@ -19,18 +19,36 @@ private
     class Task
         def initialize(id, up, down)
             @id = id
+            @is_up = false
             @up = up
             @down = down
+            @rdeps = []
         end
 
-        attr_reader :id
+        attr_reader :id, :rdeps
+
+        def up?()
+            return @is_up
+        end
 
         def up()
             @up.call
+            @is_up = true
         end
 
         def down()
+            @is_up = false
             @down.call
+        end
+
+        def <<(task)
+            task.append_to_rdeps @id
+            return self
+        end
+
+    protected
+        def append_to_rdeps(id)
+            @rdeps << id
         end
     end
 end

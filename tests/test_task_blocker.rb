@@ -22,9 +22,12 @@ class TestTaskBlocker < MiniTest::Test
     def test_basic
         g = Gross::Machine.new
         blk = g.blocker
-        g.println("UP")
-        g.rprintln("DOWN")
+        pr = g.println("UP") << blk;
+        rpr = g.rprintln("DOWN") << pr;
+        rpr2 = g.rprintln("DOWN2") << pr;
+        rpr3 = g.rprintln("DOWN3") << rpr << rpr2;
+        rpr4 = g.rprintln("DOWN4");
         assert_output("UP\n", '') { g.run }
-        assert_output("DOWN\n", '') { g.rewind(blk.id) }
+        assert_output("DOWN\nDOWN2\nDOWN3\n", '') { g.down(blk.id) }
     end
 end
