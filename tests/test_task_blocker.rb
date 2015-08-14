@@ -19,15 +19,24 @@ require 'minitest/spec'
 require 'minitest/autorun'
 
 class TestTaskBlocker < MiniTest::Test
+    def do_assert(g, blk, msg)
+        assert_output('', '') { g.run }
+        assert_output(msg, '') { g.down(blk.id) }
+    end
+
     def test_basic
         g = Gross::Machine.new
         blk = g.blocker
-        pr = g.println("UP") << blk;
-        rpr = g.rprintln("DOWN") << pr;
-        rpr2 = g.rprintln("DOWN2") << pr;
-        rpr3 = g.rprintln("DOWN3") << rpr << rpr2;
-        rpr4 = g.rprintln("DOWN4");
-        assert_output("UP\n", '') { g.run }
-        assert_output("DOWN\nDOWN2\nDOWN3\n", '') { g.down(blk.id) }
+        g.rprintln('DOWN') << blk
+        do_assert g, blk, "DOWN\n"
+    end
+
+    def test_diamond
+        g = Gross::Machine.new
+        blk = g.blocker
+        d1 = g.rprintln('DOWN 1') << blk
+        d2 = g.rprintln('DOWN 2') << blk
+        g.rprintln('DOWN 3') << d1 << d2
+        do_assert g, blk, "DOWN 1\nDOWN 2\nDOWN 3\n"
     end
 end
