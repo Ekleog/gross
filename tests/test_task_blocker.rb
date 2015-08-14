@@ -27,16 +27,16 @@ class TestTaskBlocker < MiniTest::Test
     def test_basic
         g = Gross::Machine.new
         blk = g.blocker
-        g.rprintln('DOWN') << blk
-        do_assert g, blk, "DOWN\n"
+        g.rprint('DOWN') << blk
+        do_assert g, blk, 'DOWN'
     end
 
     def test_diamond
         g = Gross::Machine.new
         blk = g.blocker
-        d1 = g.rprintln('DOWN 1') << blk
-        d2 = g.rprintln('DOWN 2') << blk
-        g.rprintln('DOWN 3') << d1 << d2
-        do_assert g, blk, "DOWN 1\nDOWN 2\nDOWN 3\n"
+        d1 = g.rprint('1') << blk
+        d2 = g.rprint('2') << blk
+        g.rprint('3') << d1 << d2
+        do_assert g, blk, "123"
     end
 end

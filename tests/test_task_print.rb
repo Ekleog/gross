@@ -18,17 +18,11 @@ require 'gross'
 require 'minitest/spec'
 require 'minitest/autorun'
 
-class TestTaskPrintln < MiniTest::Test
+class TestTaskPrint < MiniTest::Test
     def do_test(msg)
         g = Gross::Machine.new
-        g.println(msg)
-        g.die()
-        assert_output("#{msg}\n", '') do
-            begin
-                g.run()
-            rescue
-            end
-        end
+        g.print(msg)
+        assert_output(msg, '') { g.run }
     end
 
     def test_basic

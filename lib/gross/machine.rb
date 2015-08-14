@@ -48,20 +48,16 @@ module Gross
             end
         end
 
-        def println(msg)
-            add_task(up: lambda { puts msg }, down: lambda {})
+        def print(msg)
+            add_task(up: lambda { $stdout.print msg }, down: lambda {})
         end
 
-        def rprintln(msg)
-            add_task(up: lambda {}, down: lambda { puts msg })
+        def rprint(msg)
+            add_task(up: lambda {}, down: lambda { $stdout.print msg })
         end
 
         def blocker()
             add_task(up: lambda {}, down: lambda {})
-        end
-
-        def die()
-            add_task(up: lambda { raise 'dying' }, down: lambda {})
         end
     end
 end
