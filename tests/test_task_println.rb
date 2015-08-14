@@ -18,7 +18,7 @@ require 'gross'
 require 'minitest/spec'
 require 'minitest/autorun'
 
-class TestTaskPrintln < MiniTest::Unit::TestCase
+class TestTaskPrintln < MiniTest::Test
     def do_test(msg)
         g = Gross::Machine.new
         g.println(msg)
