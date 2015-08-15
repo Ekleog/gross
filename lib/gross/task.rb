@@ -18,27 +18,29 @@ module Gross
 private
     class Task
         def initialize(id, up, down)
-            @id = id
-            @is_up = false
-            @up = up
-            @down = down
-            @rdeps = []
+            @id = id        # Task ID
+            @status = :down # Status, among :down, :upping, :up and :downing
+            @up = up        # Up function
+            @down = down    # Down function
+            @rdeps = []     # List of task IDs that depend on this task
         end
 
         attr_reader :id, :rdeps
 
         def up?()
-            return @is_up
+            return @status == :up
         end
 
         def up()
+            @status = :upping
             @up.call
-            @is_up = true
+            @status = :up
         end
 
         def down()
-            @is_up = false
-            @down.call
+            @status = :downing
+            @down.call rescue
+            @status = :down
         end
 
         def <<(task)
