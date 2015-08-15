@@ -18,7 +18,7 @@ require 'gross'
 require 'minitest/spec'
 require 'minitest/autorun'
 
-class TestTaskBlocker < MiniTest::Test
+class TestMachine < MiniTest::Test
     def do_assert(g, blk, msg)
         assert_output('', '') { g.run }
         assert_output(msg, '') { g.down(blk.id) }
@@ -37,7 +37,7 @@ class TestTaskBlocker < MiniTest::Test
         d1 = g.rprint('1') << blk
         d2 = g.rprint('2') << blk
         g.rprint('3') << d1 & d2
-        do_assert g, blk, "123"
+        do_assert g, blk, '123'
     end
 
     def test_redundent
