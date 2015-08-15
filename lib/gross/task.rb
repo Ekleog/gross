@@ -17,30 +17,43 @@
 module Gross
 private
     class Task
-        def initialize(id, up, down)
+        def initialize(id, name, up, down)
             @id = id        # Task ID
+            @name = name    # Human-readable task name
             @status = :down # Status, among :down, :upping, :up and :downing
             @up = up        # Up function
             @down = down    # Down function
             @rdeps = []     # List of task IDs that depend on this task
         end
 
-        attr_reader :id, :rdeps
+        attr_reader :id, :name, :rdeps
 
         def up?()
             return @status == :up
         end
 
         def up()
+            Gross::log.info "  #{@name}: UPPING"
             @status = :upping
-            @up.call
+            begin
+                @up.call
+            rescue => e
+                return Gross::log.error "Error while upping #{@name}: #{e}"
+            end
             @status = :up
+            Gross::log.info "  #{@name}: UP"
         end
 
         def down()
+            Gross::log.info "  #{@name}: DOWNING"
             @status = :downing
-            @down.call rescue
+            begin
+                @down.call
+            rescue => e
+                Gross::log.warn "Error while downing #{@name}: #{e}"
+            end
             @status = :down
+            Gross::log.info "  #{@name}: DOWN"
         end
 
         def <<(task)

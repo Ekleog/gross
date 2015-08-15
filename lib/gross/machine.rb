@@ -23,8 +23,8 @@ module Gross
         end
 
         def add_task(up: lambda {}, down: lambda {}, name: '')
-            Gross::log.debug (name ? "Adding task '#{name}'" : 'Adding unnamed task')
-            new_task = Task.new(@tasks.length, up, down)
+            Gross::log.debug (name ? "Adding task #{name}" : 'Adding unnamed task')
+            new_task = Task.new(@tasks.length, name, up, down)
             @tasks << new_task
             return new_task
         end
@@ -38,6 +38,7 @@ module Gross
         end
 
         def down(id)
+            Gross::log.info "Task going down: #{@tasks[id].name}"
             tasks = [id]
             while !tasks.empty? do
                 next_tasks = []
@@ -49,18 +50,28 @@ module Gross
                 end
                 tasks = next_tasks
             end
+            Gross::log.info "Task successfully backtracked: #{@tasks[id].name}"
         end
 
         def print(msg)
-            add_task(up: lambda { $stdout.print msg }, down: lambda {}, name: "print #{msg}")
+            add_task(up: lambda { $stdout.print msg }, down: lambda {}, name: "print '#{shorten msg}'")
         end
 
         def rprint(msg)
-            add_task(up: lambda {}, down: lambda { $stdout.print msg }, name: "rprint #{msg}")
+            add_task(up: lambda {}, down: lambda { $stdout.print msg }, name: "rprint '#{shorten msg}'")
         end
 
         def blocker()
             add_task(up: lambda {}, down: lambda {}, name: 'blocker')
+        end
+
+    private
+        def shorten(msg)
+            if msg.length > 50
+                return msg[0, 50] + '...'
+            else
+                return msg
+            end
         end
     end
 end
