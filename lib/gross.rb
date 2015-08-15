@@ -14,8 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'logger'
+
 module Gross
     VERSION = '0.0.1'
+
+    @@log = Logger.new STDOUT
+    @@log.progname = 'gross'
+    def self.log; @@log; end
+    def self.log=(log); @@log = log; end
 end
 
 require 'gross/task'

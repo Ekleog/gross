@@ -22,16 +22,19 @@ module Gross
             @tasks = []
         end
 
-        def add_task(up: lambda {}, down: lambda {})
+        def add_task(up: lambda {}, down: lambda {}, name: '')
+            Gross::log.debug (name ? "Adding task '#{name}'" : 'Adding unnamed task')
             new_task = Task.new(@tasks.length, up, down)
             @tasks << new_task
             return new_task
         end
 
         def run()
+            Gross::log.info 'Starting'
             @tasks.each do |t|
                 t.up()
             end
+            Gross::log.info 'All tasks up'
         end
 
         def down(id)
@@ -49,15 +52,15 @@ module Gross
         end
 
         def print(msg)
-            add_task(up: lambda { $stdout.print msg }, down: lambda {})
+            add_task(up: lambda { $stdout.print msg }, down: lambda {}, name: "print #{msg}")
         end
 
         def rprint(msg)
-            add_task(up: lambda {}, down: lambda { $stdout.print msg })
+            add_task(up: lambda {}, down: lambda { $stdout.print msg }, name: "rprint #{msg}")
         end
 
         def blocker()
-            add_task(up: lambda {}, down: lambda {})
+            add_task(up: lambda {}, down: lambda {}, name: 'blocker')
         end
     end
 end

@@ -14,26 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'test_helper'
+require 'gross'
+require 'minitest/spec'
+require 'minitest/autorun'
 
-class TestTaskRprint < MiniTest::Test
-    def do_test(msg)
-        g = Gross::Machine.new
-        rpr = g.rprint(msg)
-        assert_output('', '') { g.run }
-        assert_output(msg, '') { g.down(rpr.id) }
-    end
-
-    def test_basic
-        do_test 'Hello World!'
-        do_test 'Goodbye everyone...'
-    end
-
-    def test_empty
-        do_test ''
-    end
-
-    def test_long
-        do_test 'A' * 10000
-    end
+module Gross
+    @@log = Logger.new STDERR
 end

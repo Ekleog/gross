@@ -14,9 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'gross'
-require 'minitest/spec'
-require 'minitest/autorun'
+require 'test_helper'
 
 class TestTaskPrint < MiniTest::Test
     def do_test(msg)
