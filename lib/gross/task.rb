@@ -46,6 +46,10 @@ private
             return self
         end
 
+        def &(task)
+            return self << task
+        end
+
     protected
         def append_to_rdeps(id)
             @rdeps << id
