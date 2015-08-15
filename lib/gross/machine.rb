@@ -39,17 +39,12 @@ module Gross
 
         def down(id)
             Gross::log.info "Task going down: #{@tasks[id].name}"
-            tasks = [id]
-            while !tasks.empty? do
-                next_tasks = []
-                tasks.each do |t|
-                    if @tasks[t].up?
-                        next_tasks += @tasks[t].rdeps
-                        @tasks[t].down
-                    end
+            @tasks[id].rdeps.each do |t|
+                if @tasks[t].up?
+                    down t
                 end
-                tasks = next_tasks
             end
+            @tasks[id].down
             Gross::log.info "Task successfully backtracked: #{@tasks[id].name}"
         end
 

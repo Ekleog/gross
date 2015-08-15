@@ -35,7 +35,7 @@ class TestMachine < MiniTest::Test
         d1 = g.rprint('1') << blk
         d2 = g.rprint('2') << blk
         g.rprint('3') << d1 & d2
-        do_assert g, blk, '123'
+        do_assert g, blk, /3(21|12)/
     end
 
     def test_redundent
