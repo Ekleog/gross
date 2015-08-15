@@ -39,4 +39,11 @@ class TestTaskBlocker < MiniTest::Test
         g.rprint('3') << d1 & d2
         do_assert g, blk, "123"
     end
+
+    def test_redundent
+        g = Gross::Machine.new
+        blk = g.blocker
+        g.rprint('DOWN') << blk & blk & blk
+        do_assert g, blk, 'DOWN'
+    end
 end
