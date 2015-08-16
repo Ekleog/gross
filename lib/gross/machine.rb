@@ -14,17 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'thread'
 require 'gross/task'
 
 module Gross
     class Machine
         def initialize
             @tasks = []
+            @queue = Queue.new
         end
 
         def add_task(up: lambda {}, down: lambda {}, name: '')
             Gross::log.debug (name ? "Adding task #{name}" : 'Adding unnamed task')
-            new_task = Task.new(@tasks.length, name, up, down)
+            new_task = Task.new(@tasks.length, name, @queue, up, down)
             @tasks << new_task
             return new_task
         end
@@ -32,7 +34,13 @@ module Gross
         def run
             Gross::log.info 'Starting'
             @tasks.each do |t|
-                t.up
+                t.up if @tasks[t.id].deps.empty?
+            end
+            while !@tasks.all? { |t| t.up? }
+                new_up = @queue.pop
+                @tasks[new_up].rdeps.each do |rdep|
+                    @tasks[rdep].up if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
+                end
             end
             Gross::log.info 'All tasks up'
         end

@@ -14,12 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'thread'
+
 module Gross
 private
     class Task
-        def initialize(id, name, up, down)
+        def initialize(id, name, queue, up, down)
             @id = id        # Task ID
             @name = name    # Human-readable task name
+            @queue = queue  # Pointer to the event queue in the Gross::Machine
             @status = :down # Status, among :down, :upping, :up and :downing
             @up = up        # Up function
             @down = down    # Down function
@@ -42,6 +45,7 @@ private
                 return Gross::log.error "Error while upping #{@name}: #{e}"
             end
             @status = :up
+            @queue << @id
             Gross::log.info "  #{@name}: UP"
         end
 
