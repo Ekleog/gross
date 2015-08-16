@@ -23,10 +23,11 @@ private
             @status = :down # Status, among :down, :upping, :up and :downing
             @up = up        # Up function
             @down = down    # Down function
+            @deps = []      # List of task IDs this task depends on
             @rdeps = []     # List of task IDs that depend on this task
         end
 
-        attr_reader :id, :name, :rdeps
+        attr_reader :id, :name, :deps, :rdeps
 
         def up?()
             return @status == :up
@@ -57,6 +58,7 @@ private
         end
 
         def <<(task)
+            @deps << task.id
             task.append_to_rdeps @id
             return self
         end
