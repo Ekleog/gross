@@ -40,7 +40,9 @@ module Gross
             while !@tasks.all? { |t| t.up? }
                 new_up = @queue.pop
                 @tasks[new_up].rdeps.each do |rdep|
-                    @tasks[rdep].up if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
+                    if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
+                        @tasks[rdep].up unless @tasks[rdep].upped?
+                    end
                 end
             end
             Gross::log.info 'All tasks up'

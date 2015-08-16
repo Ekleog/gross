@@ -37,6 +37,10 @@ private
             return @status == :up
         end
 
+        def upped?
+            return @status == :upping || @status == :up
+        end
+
         def up
             Gross::log.info "  #{@name}: UPPING[#{@id}]"
             @status = :upping

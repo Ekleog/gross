@@ -17,16 +17,16 @@
 require 'test_helper'
 
 class TestMachine < MiniTest::Test
-    def do_assert(g, blk, msg)
-        assert_output('', '') { g.run }
-        assert_output(msg, '') { g.down(blk.id) }
+    def do_assert(g, blk, pr, rpr)
+        assert_output(pr, '') { g.run }
+        assert_output(rpr, '') { g.down(blk.id) }
     end
 
     def test_basic
         g = Gross::Machine.new
         blk = g.blocker
         g.rprint('DOWN') << blk
-        do_assert g, blk, 'DOWN'
+        do_assert g, blk, '', 'DOWN'
     end
 
     def test_diamond
@@ -35,13 +35,14 @@ class TestMachine < MiniTest::Test
         d1 = g.rprint('1') << blk
         d2 = g.rprint('2') << blk
         g.rprint('3') << d1 & d2
-        do_assert g, blk, /3(21|12)/
+        do_assert g, blk, '', /3(21|12)/
     end
 
     def test_redundent
         g = Gross::Machine.new
         blk = g.blocker
+        g.print('UP') << blk & blk & blk
         g.rprint('DOWN') << blk & blk & blk
-        do_assert g, blk, 'DOWN'
+        do_assert g, blk, 'UP', 'DOWN'
     end
 end
