@@ -25,8 +25,9 @@ module Gross
         end
 
         def add_task(up: lambda {}, down: lambda {}, name: '')
-            Gross::log.debug (name ? "Adding task #{name}" : 'Adding unnamed task')
-            new_task = Task.new(@tasks.length, name, @queue, up, down)
+            id = @tasks.length
+            Gross::log.debug (name ? "Adding task[#{id}] #{name}" : "Adding unnamed task[#{id}]")
+            new_task = Task.new(id, name, @queue, up, down)
             @tasks << new_task
             return new_task
         end
@@ -46,12 +47,12 @@ module Gross
         end
 
         def down(id)
-            Gross::log.info "Task going down: #{@tasks[id].name}"
+            Gross::log.info "Task[#{id}] going down: #{@tasks[id].name}"
             @tasks[id].rdeps.each do |t|
                 down t if @tasks[t].up?
             end
             @tasks[id].down
-            Gross::log.info "Task successfully backtracked: #{@tasks[id].name}"
+            Gross::log.info "Task[#{id}] successfully backtracked: #{@tasks[id].name}"
         end
 
         def print(msg)

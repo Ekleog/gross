@@ -38,31 +38,31 @@ private
         end
 
         def up
-            Gross::log.info "  #{@name}: UPPING"
+            Gross::log.info "  #{@name}: UPPING[#{@id}]"
             @status = :upping
             @thread = Thread.new do
                 begin
                     @up.call
                     @status = :up
-                    Gross::log.info "  #{@name}: UP"
+                    Gross::log.info "  #{@name}: UP[#{@id}]"
                     @queue << @id
                 rescue
                     # Logger is thread-safe
-                    Gross::log.error "Error while upping #{@name}: #{e}"
+                    Gross::log.error "Error while upping[#{@id}] #{@name}: #{e}"
                 end
             end
         end
 
         def down
-            Gross::log.info "  #{@name}: DOWNING"
+            Gross::log.info "  #{@name}: DOWNING[#{@id}]"
             @status = :downing
             begin
                 @down.call
             rescue => e
-                Gross::log.warn "Error while downing #{@name}: #{e}"
+                Gross::log.warn "Error while downing[#{@id}] #{@name}: #{e}"
             end
             @status = :down
-            Gross::log.info "  #{@name}: DOWN"
+            Gross::log.info "  #{@name}: DOWN[#{@id}]"
         end
 
         def <<(task)
