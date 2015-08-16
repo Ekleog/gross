@@ -28,6 +28,7 @@ private
             @down = down    # Down function
             @deps = []      # List of task IDs this task depends on
             @rdeps = []     # List of task IDs that depend on this task
+            @thread = nil   # Thread running, if :upping or :downing ; nil otherwise
         end
 
         attr_reader :id, :name, :deps, :rdeps
@@ -39,14 +40,17 @@ private
         def up
             Gross::log.info "  #{@name}: UPPING"
             @status = :upping
-            begin
-                @up.call
-            rescue => e
-                return Gross::log.error "Error while upping #{@name}: #{e}"
+            @thread = Thread.new do
+                begin
+                    @up.call
+                    @status = :up
+                    Gross::log.info "  #{@name}: UP"
+                    @queue << @id
+                rescue
+                    # Logger is thread-safe
+                    Gross::log.error "Error while upping #{@name}: #{e}"
+                end
             end
-            @status = :up
-            @queue << @id
-            Gross::log.info "  #{@name}: UP"
         end
 
         def down
