@@ -18,7 +18,7 @@ require 'gross/task'
 
 module Gross
     class Machine
-        def initialize()
+        def initialize
             @tasks = []
         end
 
@@ -29,10 +29,10 @@ module Gross
             return new_task
         end
 
-        def run()
+        def run
             Gross::log.info 'Starting'
             @tasks.each do |t|
-                t.up()
+                t.up
             end
             Gross::log.info 'All tasks up'
         end
@@ -40,9 +40,7 @@ module Gross
         def down(id)
             Gross::log.info "Task going down: #{@tasks[id].name}"
             @tasks[id].rdeps.each do |t|
-                if @tasks[t].up?
-                    down t
-                end
+                down t if @tasks[t].up?
             end
             @tasks[id].down
             Gross::log.info "Task successfully backtracked: #{@tasks[id].name}"
@@ -56,7 +54,7 @@ module Gross
             add_task(up: lambda {}, down: lambda { $stdout.print msg }, name: "rprint '#{shorten msg}'")
         end
 
-        def blocker()
+        def blocker
             add_task(up: lambda {}, down: lambda {}, name: 'blocker')
         end
 

@@ -29,11 +29,11 @@ private
 
         attr_reader :id, :name, :deps, :rdeps
 
-        def up?()
+        def up?
             return @status == :up
         end
 
-        def up()
+        def up
             Gross::log.info "  #{@name}: UPPING"
             @status = :upping
             begin
@@ -45,7 +45,7 @@ private
             Gross::log.info "  #{@name}: UP"
         end
 
-        def down()
+        def down
             Gross::log.info "  #{@name}: DOWNING"
             @status = :downing
             begin
