@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'thread'
 require 'gross/task'
 
 module Gross
