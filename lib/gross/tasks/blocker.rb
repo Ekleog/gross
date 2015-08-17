@@ -17,7 +17,7 @@
 module Gross
     class Machine
         def blocker
-            add_task(up: lambda {}, down: lambda {}, name: 'blocker')
+            add_task(name: 'blocker')
         end
     end
 end

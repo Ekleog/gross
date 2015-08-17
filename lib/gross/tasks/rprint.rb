@@ -17,7 +17,7 @@
 module Gross
     class Machine
         def rprint(msg)
-            add_task(up: lambda {}, down: lambda { $stdout.print msg }, name: "rprint '#{shorten msg}'")
+            add_task(down: lambda { $stdout.print msg }, name: "rprint '#{shorten msg}'")
         end
     end
 end

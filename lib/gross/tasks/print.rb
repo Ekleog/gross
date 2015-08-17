@@ -17,7 +17,7 @@
 module Gross
     class Machine
         def print(msg)
-            add_task(up: lambda { $stdout.print msg }, down: lambda {}, name: "print '#{shorten msg}'")
+            add_task(up: lambda { $stdout.print msg }, name: "print '#{shorten msg}'")
         end
     end
 end
