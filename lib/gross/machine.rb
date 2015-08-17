@@ -57,18 +57,6 @@ module Gross
             Gross::log.info "Task[#{id}] successfully backtracked: #{@tasks[id].name}"
         end
 
-        def print(msg)
-            add_task(up: lambda { $stdout.print msg }, down: lambda {}, name: "print '#{shorten msg}'")
-        end
-
-        def rprint(msg)
-            add_task(up: lambda {}, down: lambda { $stdout.print msg }, name: "rprint '#{shorten msg}'")
-        end
-
-        def blocker
-            add_task(up: lambda {}, down: lambda {}, name: 'blocker')
-        end
-
     private
         def shorten(msg)
             if msg.length > 50
@@ -79,3 +67,6 @@ module Gross
         end
     end
 end
+
+# Require task files
+Dir[File.dirname(__FILE__) + '/tasks/*.rb'].each{ |file| require file }
