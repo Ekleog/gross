@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'ostruct'
 require 'thread'
 
 module Gross
@@ -49,7 +50,7 @@ private
                     @up.call
                     @status = :up
                     Gross::log.info "  #{@name}: UP[#{@id}]"
-                    @queue << @id
+                    @queue << OpenStruct.new({ type: :up, id: @id })
                 rescue
                     # Logger is thread-safe
                     Gross::log.error "Error while upping[#{@id}] #{@name}: #{e}"

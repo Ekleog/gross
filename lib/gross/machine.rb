@@ -37,11 +37,15 @@ module Gross
                 t.up if @tasks[t.id].deps.empty?
             end
             while !@tasks.all? { |t| t.up? }
-                new_up = @queue.pop
-                @tasks[new_up].rdeps.each do |rdep|
-                    if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
-                        @tasks[rdep].up unless @tasks[rdep].upped?
+                msg = @queue.pop
+                if msg.type == :up
+                    @tasks[msg.id].rdeps.each do |rdep|
+                        if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
+                            @tasks[rdep].up unless @tasks[rdep].upped?
+                        end
                     end
+                else
+                    Gross::log.error "Received invalid message: #{msg}"
                 end
             end
             Gross::log.info 'All tasks up'
