@@ -14,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'ostruct'
 require 'gross/task'
 
 module Gross
     class Machine
         def initialize
             @tasks = []
-            @context = {}
+            @context = OpenStruct.new
             @queue = Queue.new
         end
 
@@ -68,6 +69,17 @@ module Gross
             else
                 return msg
             end
+        end
+
+        def no_context
+            return DummyContext.new
+        end
+    end
+
+    class DummyContext < OpenStruct
+        def method_missing(mid, *args)
+            @table[mid] = "{{ #{mid} }}" if args.length == 0 && !@table.has_key?(mid)
+            return super(mid, *args)
         end
     end
 end
