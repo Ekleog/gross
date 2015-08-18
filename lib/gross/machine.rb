@@ -20,13 +20,14 @@ module Gross
     class Machine
         def initialize
             @tasks = []
+            @context = {}
             @queue = Queue.new
         end
 
-        def add_task(up: lambda {}, down: lambda {}, name: '')
+        def add_task(ident: '', name: '', up: lambda {}, down: lambda {})
             id = @tasks.length
             Gross::log.debug (name ? "Adding task[#{id}] #{name}" : "Adding unnamed task[#{id}]")
-            new_task = Task.new(id, name, @queue, up, down)
+            new_task = Task.new(id, ident, name, @queue, up, down)
             @tasks << new_task
             return new_task
         end

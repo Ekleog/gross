@@ -20,8 +20,9 @@ require 'gross/message'
 module Gross
 private
     class Task
-        def initialize(id, name, queue, up, down)
+        def initialize(id, ident, name, queue, up, down)
             @id = id        # Task ID
+            @ident = ident  # Human-readable ID (short)
             @name = name    # Human-readable task name
             @queue = queue  # Pointer to the event queue in the Gross::Machine
             @status = :down # Status, among :down, :upping, :up and :downing

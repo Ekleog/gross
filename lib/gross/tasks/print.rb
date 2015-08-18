@@ -16,8 +16,13 @@
 
 module Gross
     class Machine
-        def print(msg)
-            add_task(up: lambda { $stdout.print msg }, name: "print '#{shorten msg}'")
+        def print(msg='', &block)
+            message = ->(ctx) { msg } if !msg.respond_to? :call
+            message = block if block
+            add_task(
+                name: "print '#{shorten message.call(Hash.new{|h, k| h[k] = "{{ #{k} }}"})}'",
+                up: lambda { $stdout.print(message.call @context) }
+            )
         end
     end
 end
