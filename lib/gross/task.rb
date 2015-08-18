@@ -44,31 +44,31 @@ private
         end
 
         def up
-            Gross::log.info "  #{@name}: UPPING[#{@id}]"
+            Gross::log.info "  #{@name}: UPPING[#{hrid}]"
             @status = :upping
             @thread = Thread.new do
                 begin
                     @up.call
                     @status = :up
-                    Gross::log.info "  #{@name}: UP[#{@id}]"
+                    Gross::log.info "  #{@name}: UP[#{hrid}]"
                     @queue << Message.up(@id)
                 rescue
                     # Logger is thread-safe
-                    Gross::log.error "Error while upping[#{@id}] #{@name}: #{e}"
+                    Gross::log.error "Error while upping[#{hrid}] #{@name}: #{e}"
                 end
             end
         end
 
         def down
-            Gross::log.info "  #{@name}: DOWNING[#{@id}]"
+            Gross::log.info "  #{@name}: DOWNING[#{hrid}]"
             @status = :downing
             begin
                 @down.call
             rescue => e
-                Gross::log.warn "Error while downing[#{@id}] #{@name}: #{e}"
+                Gross::log.warn "Error while downing[#{hrid}] #{@name}: #{e}"
             end
             @status = :down
-            Gross::log.info "  #{@name}: DOWN[#{@id}]"
+            Gross::log.info "  #{@name}: DOWN[#{hrid}]"
         end
 
         def <<(task)
@@ -85,5 +85,12 @@ private
         def append_to_rdeps(id)
             @rdeps << id
         end
+
+    private
+        # Human-readable identifier
+        def hrid
+            return "#{@ident}(#{@id})"
+        end
+
     end
 end
