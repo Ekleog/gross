@@ -28,10 +28,10 @@ module Gross
 
         attr_reader :queue
 
-        def add_task(ident: '', name: '', up: lambda {}, down: lambda {})
+        def add_task(name: '', up: lambda {}, down: lambda {})
             id = @tasks.length
             Gross::log.debug (name ? "Adding task[#{@name}[#{id}]] #{name}" : "Adding unnamed task[#{@name}[#{id}]]")
-            new_task = Task.new(id, ident, name, @name, @queue, up, down)
+            new_task = Task.new(id, name, @name, @queue, up, down)
             @tasks << new_task
             return new_task
         end

@@ -20,9 +20,8 @@ require 'gross/message'
 module Gross
 private
     class Task
-        def initialize(id, ident, name, machine_name, queue, up, down)
+        def initialize(id, name, machine_name, queue, up, down)
             @id = id        # Task ID
-            @ident = ident  # Human-readable ID (short)
             @name = name    # Human-readable task name
             @machine_name = machine_name # Machine name
             @queue = queue  # Pointer to the event queue in the Gross::Machine
@@ -45,13 +44,13 @@ private
         end
 
         def up
-            Gross::log.info "  #{@name}: UPPING[#{hrid}]"
+            Gross::log.info "  UPPING[#{hrid}]: #{@name}"
             @status = :upping
             @thread = Thread.new do
                 begin
                     @up.call
                     @status = :up
-                    Gross::log.info "  #{@name}: UP[#{hrid}]"
+                    Gross::log.info "  UP[#{hrid}]: #{@name}"
                     @queue << Message.up(@id)
                 rescue
                     # Logger is thread-safe
@@ -61,7 +60,7 @@ private
         end
 
         def down
-            Gross::log.info "  #{@name}: DOWNING[#{hrid}]"
+            Gross::log.info "  DOWNING[#{hrid}]: #{@name}"
             @status = :downing
             begin
                 @down.call
@@ -69,7 +68,7 @@ private
                 Gross::log.warn "Error while downing[#{hrid}] #{@name}: #{e}"
             end
             @status = :down
-            Gross::log.info "  #{@name}: DOWN[#{hrid}]"
+            Gross::log.info "  DOWN[#{hrid}]: #{@name}"
         end
 
         def <<(task)
@@ -90,7 +89,7 @@ private
     private
         # Human-readable identifier
         def hrid
-            return "#{@ident}(#{@machine_name}[#{@id}])"
+            return "#{@machine_name}[#{@id}]"
         end
 
     end
