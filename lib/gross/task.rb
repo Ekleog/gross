@@ -35,6 +35,11 @@ private
 
         attr_reader :id, :name, :deps, :rdeps
 
+        # Human-readable identifier
+        def hrid
+            return "#{@machine_name}[#{@id}]"
+        end
+
         def up?
             return @status == :up
         end
@@ -85,12 +90,5 @@ private
         def append_to_rdeps(id)
             @rdeps << id
         end
-
-    private
-        # Human-readable identifier
-        def hrid
-            return "#{@machine_name}[#{@id}]"
-        end
-
     end
 end
