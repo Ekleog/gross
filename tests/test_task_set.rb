@@ -42,4 +42,16 @@ class TestTaskSet < MiniTest::Test
     def test_var_not_string
         do_test 'test_var_not_string', :var, 'test'
     end
+
+    def test_val_dict
+        g = Gross::Machine.new 'TestTaskSet::test_basic'
+        blk = g.blocker
+        var = g.set('var', { key: 'test' }) << blk
+        g.print{|c| "This is a #{c.var[:key]} upping"} << var
+        g.rprint{|c| "This is a #{c.var[:key]} downing"} << var
+        q = nil
+        assert_output("This is a test upping", '') { q = run_block_until_up g }
+        assert_output("This is a test downing", '') { down_block_until_down(g, q, blk.id) }
+        g.queue << Gross::Message.exit
+    end
 end

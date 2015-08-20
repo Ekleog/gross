@@ -77,22 +77,12 @@ module Gross
         end
 
         def shorten(msg)
+            msg = msg.to_s
             if msg.length > 50
                 return msg[0, 50] + '...'
             else
                 return msg
             end
-        end
-
-        def no_context
-            return DummyContext.new
-        end
-    end
-
-    class DummyContext < OpenStruct
-        def method_missing(mid, *args)
-            @table[mid] = "{{ #{mid} }}" if args.length == 0 && !@table.has_key?(mid)
-            return super(mid, *args)
         end
     end
 end
