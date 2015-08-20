@@ -57,7 +57,7 @@ private
                     @status = :up
                     Gross::log.info "  UP[#{hrid}]: #{@name}"
                     @queue << Message.up(@id)
-                rescue
+                rescue => e
                     # Logger is thread-safe
                     Gross::log.error "Error while upping[#{hrid}] #{@name}: #{e}"
                 end
