@@ -18,11 +18,11 @@ module Gross
     class Machine
         def set(variable, value)
             var = variable
-            var = ->(ctx) { variable } if !var.respond_to? :call
+            var = ->(ctx) { variable.to_s } if !var.respond_to? :call
             val = value
             val = ->(ctx) { value } if !val.respond_to? :call
             add_task(
-                name: "set '#{shorten var.call no_context}' := '#{shorten val.call no_context}'",
+                name: "set '#{shorten var.call(no_context).to_s}' := '#{shorten val.call(no_context).to_s}'",
                 up: lambda { @context[var.call @context] = val.call @context },
                 down: lambda { @context.delete_field var.call no_context }
             )

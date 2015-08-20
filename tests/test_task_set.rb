@@ -17,15 +17,29 @@
 require 'test_helper'
 
 class TestTaskSet < MiniTest::Test
-    def test_basic
-        g = Gross::Machine.new 'TestTaskSet::test_basic'
+    def do_test(name, var, val) # var must be equivalent to "var"
+        g = Gross::Machine.new "TestTaskSet::#{name}"
         blk = g.blocker
-        var = g.set('var', 'test') << blk
+        var = g.set(var, val) << blk
         g.print{|c| "This is a #{c.var} upping"} << var
         g.rprint{|c| "This is a #{c.var} downing"} << var
         q = nil
-        assert_output('This is a test upping', '') { q = run_block_until_up g }
-        assert_output('This is a test downing', '') { down_block_until_down(g, q, blk.id) }
+        assert_output("This is a #{val} upping", '') { q = run_block_until_up g }
+        assert_output("This is a #{val} downing", '') { down_block_until_down(g, q, blk.id) }
         g.queue << Gross::Message.exit
+    end
+
+    def test_basic
+        do_test 'test_basic', 'var', 'test'
+    end
+
+    def test_val_not_string
+        do_test 'test_val_not_string::true', 'var', true
+        do_test 'test_val_not_string::42', 'var', 42
+        do_test 'test_val_not_string::nil', 'var', nil
+    end
+
+    def test_var_not_string
+        do_test 'test_var_not_string', :var, 'test'
     end
 end
