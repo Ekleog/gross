@@ -26,7 +26,7 @@ class TestTaskConditional < MiniTest::Test
                 h.print 'WORKS'
                 h.rprint 'WORKS'
             end],
-            ['default', lambda { true }, lambda do |h|
+            ['default', lambda { |c| true }, lambda do |h|
                 h.print 'DOESN\'T WORK'
                 h.rprint 'DOESN\'T WORK'
             end]
@@ -34,6 +34,53 @@ class TestTaskConditional < MiniTest::Test
         q = nil
         assert_output('WORKS', '') { q = run_block_until_up g }
         assert_output('WORKS', '') { down_block_until_down(g, q, blk.id) }
+        g.queue << Gross::Message.exit
+    end
+
+    def test_second
+        g = Gross::Machine.new 'TestTaskConditional::test_second'
+        blk = g.blocker
+        var = g.set('cond', true) << blk
+        g.conditional([
+            ['false', lambda { |c| false }, lambda do |h|
+                h.print 'FAILS' # Yes, I really have no clue what to put there, so let's be more diverse
+                h.rprint 'FAILS'
+            end],
+            ['true', lambda { |c| c.cond }, lambda do |h|
+                h.print 'YES'
+                h.rprint 'YEEESS'
+            end],
+            ['default', lambda { |c| true }, lambda do |h|
+                h.print 'WHY?'
+            end]
+        ]) << var
+        q = nil
+        assert_output('YES', '') { q = run_block_until_up g }
+        assert_output('YEEESS', '') { down_block_until_down(g, q, blk.id) }
+        g.queue << Gross::Message.exit
+    end
+
+    def test_last
+        g = Gross::Machine.new 'TestTaskConditional::test_last'
+        blk = g.blocker
+        var = g.set('cond', false) << blk
+        g.conditional([
+            ['false', lambda { |c| false }, lambda do |h|
+                h.print 'FAILS'
+                h.rprint 'FAILS'
+            end],
+            ['other_false', lambda { |c| c.cond }, lambda do |h|
+                h.print 'NOTHING'
+                h.rprint 'NOTHING MORE'
+            end],
+            ['default', lambda { |c| true }, lambda do |h|
+                h.print 'DID IT'
+                h.rprint 'WELL DONE'
+            end]
+        ]) << var
+        q = nil
+        assert_output('DID IT', '') { q = run_block_until_up g }
+        assert_output('WELL DONE', '') { down_block_until_down(g, q, blk.id) }
         g.queue << Gross::Message.exit
     end
 end
