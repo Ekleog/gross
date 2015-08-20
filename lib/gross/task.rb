@@ -76,15 +76,14 @@ private
             Gross::log.info "  DOWN[#{hrid}]: #{@name}"
         end
 
-        def <<(task)
+        def depends(task)
             @deps << task.id
             task.append_to_rdeps @id
             return self
         end
 
-        def &(task)
-            return self << task
-        end
+        alias_method :<<, :depends
+        alias_method :&, :depends
 
     protected
         def append_to_rdeps(id)
