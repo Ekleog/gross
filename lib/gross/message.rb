@@ -32,5 +32,13 @@ private
         def self.up(id)
             return new(:up, { id: id })
         end
+
+        def self.down(id)
+            return new(:down, { id: id })
+        end
+
+        def self.exit
+            return new(:exit, {})
+        end
     end
 end

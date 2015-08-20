@@ -18,8 +18,10 @@ require 'test_helper'
 
 class TestMachine < MiniTest::Test
     def do_assert(g, blk, pr, rpr)
-        assert_output(pr, '') { g.run }
-        assert_output(rpr, '') { g.down(blk.id) }
+        q = nil
+        assert_output(pr, '') { q = run_block_until_up g }
+        assert_output(rpr, '') { down_block_until_down(g, q, blk.id) }
+        g.queue << Gross::Message.exit
     end
 
     def test_basic

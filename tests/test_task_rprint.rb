@@ -20,8 +20,10 @@ class TestTaskRprint < MiniTest::Test
     def do_test(msg)
         g = Gross::Machine.new "TestTaskRprint[#{short msg}]"
         rpr = g.rprint(msg)
-        assert_output('', '') { g.run }
-        assert_output(msg, '') { g.down(rpr.id) }
+        q = nil
+        assert_output('', '') { q = run_block_until_up g }
+        assert_output(msg, '') { down_block_until_down(g, q, rpr.id) }
+        g.queue << Gross::Message.exit
     end
 
     def test_basic

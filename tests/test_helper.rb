@@ -17,6 +17,7 @@
 require 'gross'
 require 'minitest/spec'
 require 'minitest/autorun'
+require 'thread'
 
 module Gross
     @@log = Logger.new STDERR
@@ -27,5 +28,25 @@ def short(msg)
         return msg[0, 10] + '...'
     else
         return msg
+    end
+end
+
+def run_block_until_up(g)
+    queue = Queue.new
+    thr = Thread.new { g.run queue }
+    # Wait until machine is up
+    stop = false
+    while !stop
+        stop = true if queue.pop.type == :up
+    end
+    return queue
+end
+
+def down_block_until_down(g, q, id)
+    g.queue << Gross::Message.down(id)
+    # Wait until down
+    stop = false
+    while !stop
+        stop = true if q.pop.type == :down
     end
 end

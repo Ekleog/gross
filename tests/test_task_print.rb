@@ -20,7 +20,8 @@ class TestTaskPrint < MiniTest::Test
     def do_test(msg)
         g = Gross::Machine.new "TestTaskPrint[#{short msg}]"
         g.print(msg)
-        assert_output(msg, '') { g.run }
+        assert_output(msg, '') { run_block_until_up g }
+        g.queue << Gross::Message.exit
     end
 
     def test_basic

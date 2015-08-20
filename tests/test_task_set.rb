@@ -23,7 +23,9 @@ class TestTaskSet < MiniTest::Test
         var = g.set('var', 'test') << blk
         g.print{|c| "This is a #{c.var} upping"} << var
         g.rprint{|c| "This is a #{c.var} downing"} << var
-        assert_output('This is a test upping', '') { g.run }
-        assert_output('This is a test downing', '') { g.down(blk.id) }
+        q = nil
+        assert_output('This is a test upping', '') { q = run_block_until_up g }
+        assert_output('This is a test downing', '') { down_block_until_down(g, q, blk.id) }
+        g.queue << Gross::Message.exit
     end
 end

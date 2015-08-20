@@ -26,6 +26,8 @@ module Gross
             @name = name
         end
 
+        attr_reader :queue
+
         def add_task(ident: '', name: '', up: lambda {}, down: lambda {})
             id = @tasks.length
             Gross::log.debug (name ? "Adding task[#{@name}[#{id}]] #{name}" : "Adding unnamed task[#{@name}[#{id}]]")
@@ -34,26 +36,37 @@ module Gross
             return new_task
         end
 
-        def run
+        def run(extqueue = nil)
             Gross::log.info "Starting up machine '#{@name}'"
             @tasks.each do |t|
                 t.up if @tasks[t.id].deps.empty?
             end
-            while !@tasks.all? { |t| t.up? }
+            while true
                 msg = @queue.pop
-                if msg.type == :up
+                case msg.type
+                when :up
                     @tasks[msg.id].rdeps.each do |rdep|
                         if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
                             @tasks[rdep].up unless @tasks[rdep].upped?
                         end
                     end
+                    if @tasks.all? { |t| t.up? }
+                        Gross::log.info "All tasks up for machine '#{@name}'"
+                        extqueue << Message.up(0) unless extqueue == nil
+                    end
+                when :down
+                    down msg.id
+                    extqueue << Message.down(0) unless extqueue == nil
+                when :exit
+                    @tasks.each_index { |id| down id if @tasks[id].upped? }
+                    return
                 else
                     Gross::log.error "Machine '#{@name}' received invalid message: #{msg}"
                 end
             end
-            Gross::log.info "All tasks up for machine '#{@name}'"
         end
 
+    private
         def down(id)
             Gross::log.info "Task[#{@name}[#{id}]] going down: #{@tasks[id].name}"
             @tasks[id].rdeps.each do |t|
@@ -63,7 +76,6 @@ module Gross
             Gross::log.info "Task[#{@name}[#{id}]] successfully backtracked: #{@tasks[id].name}"
         end
 
-    private
         def shorten(msg)
             if msg.length > 50
                 return msg[0, 50] + '...'
