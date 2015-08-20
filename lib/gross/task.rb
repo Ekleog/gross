@@ -20,10 +20,11 @@ require 'gross/message'
 module Gross
 private
     class Task
-        def initialize(id, ident, name, queue, up, down)
+        def initialize(id, ident, name, machine_name, queue, up, down)
             @id = id        # Task ID
             @ident = ident  # Human-readable ID (short)
             @name = name    # Human-readable task name
+            @machine_name = machine_name # Machine name
             @queue = queue  # Pointer to the event queue in the Gross::Machine
             @status = :down # Status, among :down, :upping, :up and :downing
             @up = up        # Up function
@@ -89,7 +90,7 @@ private
     private
         # Human-readable identifier
         def hrid
-            return "#{@ident}(#{@id})"
+            return "#{@ident}(#{@machine_name}[#{@id}])"
         end
 
     end

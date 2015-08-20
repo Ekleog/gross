@@ -19,22 +19,23 @@ require 'gross/task'
 
 module Gross
     class Machine
-        def initialize
+        def initialize(name = 'MAIN')
             @tasks = []
             @context = OpenStruct.new
             @queue = Queue.new
+            @name = name
         end
 
         def add_task(ident: '', name: '', up: lambda {}, down: lambda {})
             id = @tasks.length
-            Gross::log.debug (name ? "Adding task[#{id}] #{name}" : "Adding unnamed task[#{id}]")
-            new_task = Task.new(id, ident, name, @queue, up, down)
+            Gross::log.debug (name ? "Adding task[#{@name}[#{id}]] #{name}" : "Adding unnamed task[#{@name}[#{id}]]")
+            new_task = Task.new(id, ident, name, @name, @queue, up, down)
             @tasks << new_task
             return new_task
         end
 
         def run
-            Gross::log.info 'Starting'
+            Gross::log.info "Starting up machine '#{@name}'"
             @tasks.each do |t|
                 t.up if @tasks[t.id].deps.empty?
             end
@@ -47,19 +48,19 @@ module Gross
                         end
                     end
                 else
-                    Gross::log.error "Received invalid message: #{msg}"
+                    Gross::log.error "Machine '#{@name}' received invalid message: #{msg}"
                 end
             end
-            Gross::log.info 'All tasks up'
+            Gross::log.info "All tasks up for machine '#{@name}'"
         end
 
         def down(id)
-            Gross::log.info "Task[#{id}] going down: #{@tasks[id].name}"
+            Gross::log.info "Task[#{@name}[#{id}]] going down: #{@tasks[id].name}"
             @tasks[id].rdeps.each do |t|
                 down t if @tasks[t].up?
             end
             @tasks[id].down
-            Gross::log.info "Task[#{id}] successfully backtracked: #{@tasks[id].name}"
+            Gross::log.info "Task[#{@name}[#{id}]] successfully backtracked: #{@tasks[id].name}"
         end
 
     private

@@ -23,14 +23,14 @@ class TestMachine < MiniTest::Test
     end
 
     def test_basic
-        g = Gross::Machine.new
+        g = Gross::Machine.new 'TestMachine::test_basic'
         blk = g.blocker
         g.rprint('DOWN') << blk
         do_assert g, blk, '', 'DOWN'
     end
 
     def test_diamond
-        g = Gross::Machine.new
+        g = Gross::Machine.new 'TestMachine::test_diamond'
         blk = g.blocker
         d1 = g.rprint('1') << blk
         d2 = g.rprint('2') << blk
@@ -39,7 +39,7 @@ class TestMachine < MiniTest::Test
     end
 
     def test_redundent
-        g = Gross::Machine.new
+        g = Gross::Machine.new 'TestMachine::test_redundent'
         blk = g.blocker
         g.print('UP') << blk & blk & blk
         g.rprint('DOWN') << blk & blk & blk

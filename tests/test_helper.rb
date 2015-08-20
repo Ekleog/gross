@@ -21,3 +21,11 @@ require 'minitest/autorun'
 module Gross
     @@log = Logger.new STDERR
 end
+
+def short(msg)
+    if msg.length > 7
+        return msg[0, 10] + '...'
+    else
+        return msg
+    end
+end

@@ -18,7 +18,7 @@ require 'test_helper'
 
 class TestTaskSet < MiniTest::Test
     def test_basic
-        g = Gross::Machine.new
+        g = Gross::Machine.new 'TestTaskSet::test_basic'
         blk = g.blocker
         var = g.set('var', 'test') << blk
         g.print{|c| "This is a #{c.var} upping"} << var

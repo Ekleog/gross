@@ -18,7 +18,7 @@ require 'test_helper'
 
 class TestTaskRprint < MiniTest::Test
     def do_test(msg)
-        g = Gross::Machine.new
+        g = Gross::Machine.new "TestTaskRprint[#{short msg}]"
         rpr = g.rprint(msg)
         assert_output('', '') { g.run }
         assert_output(msg, '') { g.down(rpr.id) }
