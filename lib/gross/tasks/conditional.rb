@@ -16,14 +16,28 @@
 
 module Gross
     class Machine
-        # Format for args:
-        # [
-        #   [name, cond, code],
-        #   [name, cond, code],
-        #   ...,
-        #   [name, cond, code]
-        # ]
-        # First match will stop evaluation
+        #
+        # @!group Tasks
+        #
+
+        #
+        # Adds a conditional task
+        #
+        # A conditional task will evaluate a series of conditions, stopping at the first one which
+        # evaluates to +true+ and executing the corresponding code
+        #
+        # The argument +args+ is defined as a list of (+name+, +condition+, +code+) triplets.
+        # [+name+] +name+ is the human-readable name by which name the internally-generated
+        #          {Machine machine} --- actual name will be current_task.hrid[name]. Should be set as a
+        #          name clearly identifying the condition
+        # [+condition+] +condition+ is the condition given as a {file:docs/ContextCallable.rdoc ContextCallable}
+        # [+code+] +code+ is the code generator, given as a {file:docs/MachineCallable.rdoc MachineCallable}
+        #
+        # @param name [String] A human-readable name for the task
+        # @param args [Array<Array<(String, #call, #call)>>] The elements to evaluate, see description above
+        #
+        # @return [Task] A task that implements the conditional behaviour defined above
+        #
         def conditional(name='conditional', args)
             machine = nil
             queue = Queue.new
@@ -34,7 +48,7 @@ module Gross
                 up:   lambda do
                     args.each do |name, cond, code|
                         if cond.call @context
-                            machine = Machine.new "#{task.hrid}[#{name}"
+                            machine = Machine.new "#{task.hrid}[#{name}]"
                             code.call machine
                             thread = Thread.new { machine.run queue }
                             while queue.pop.type != :up; end
@@ -48,5 +62,9 @@ module Gross
                 end
             )
         end
+
+        #
+        # @!endgroup
+        #
     end
 end

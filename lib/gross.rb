@@ -17,8 +17,26 @@
 require 'logger'
 
 module Gross
+    #
+    # Returns the version of gross
+    #
+    # The version X.Y.Z will be bumped as follows:
+    # [X, the major version] Will be bumped after a non-backwards-compatible change
+    # [Y, the minor version] Will be bumped after backwards-compatible API changes
+    # [Z, the patch version] Will be bumped after each patch that does not change API
+    #
+    # @return [String] The version of gross
+    #
     VERSION = '0.0.1'
 
+    #
+    # Returns the logger to be used by gross {Machine machines}.
+    #
+    # Should provide at least {Logger#debug #debug}, {Logger#info #info}, {Logger#warn #warn},
+    # {Logger#error #error} and {Logger#fatal #fatal}.
+    #
+    # @return [Logger] the logger gross will use to describe its evolution
+    #
     @@log = Logger.new STDOUT
     @@log.progname = 'gross'
     def self.log; @@log; end

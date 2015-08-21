@@ -1,0 +1,16 @@
+= Machine Callable
+
+A machine callable is a callable that takes one argument, a {Gross::Machine} to fill, usually
+noted +g+ (or +h+ if +g+ is already taken, etc).
+
+As an example, the following code would print +"This is a test"+:
+
+    g = Gross::Machine.new
+    g.if ->(c) { true } do |h|
+        h.print "This is a test"
+    end
+    g.end
+    g.run
+
+See also the documentation of {file:docs/ContextCallable.rdoc context callables} for more details
+on how the {Gross::Machine#if +if+} statement works here.

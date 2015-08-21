@@ -16,6 +16,20 @@
 
 module Gross
     class Machine
+        #
+        # @!group Tasks::Debug
+        #
+
+        #
+        # Writes a message to stdout when task is brought up
+        #
+        # @overload print(message)
+        #   @param message [ContextCallable] Message to print as a {file:docs/ContextCallable.rdoc ContextCallable}
+        # @overload print(&block)
+        #   @param block [#call] Message to print as a {file:docs/ContextCallable.rdoc ContextCallable}
+        #
+        # @return [Task] A task that prints the message given as a parameter when being brought up
+        #
         def print(message='', &block)
             name = '{{ function }}'
             msg = message
@@ -29,5 +43,9 @@ module Gross
                 up: lambda { $stdout.print(msg.call @context) }
             )
         end
+
+        #
+        # @!endgroup
+        #
     end
 end

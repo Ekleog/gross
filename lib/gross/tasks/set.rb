@@ -16,6 +16,16 @@
 
 module Gross
     class Machine
+        #
+        # @!group Tasks
+        #
+
+        #
+        # Sets a variable to a value
+        #
+        # @param variable [ContextCallable] Variable name, given as a {file:docs/ContextCallable.rdoc ContextCallable}
+        # @param value [ContextCallable] Value of the variable, given as a {file:docs/ContextCallable.rdoc ContextCallable}
+        #
         def set(variable, value)
             varname = '{{ function }}'
             var = variable

@@ -16,8 +16,25 @@
 
 module Gross
     class Machine
-        def blocker
-            add_task(name: 'blocker')
+        #
+        # @!group Tasks
+        #
+
+        #
+        # Adds a blocker task
+        #
+        # A blocker is a dummy task, whose only aim is to provide a backtrack point
+        #
+        # @param name A human-readable name for the task
+        #
+        # @return [Task] The created blocker task
+        #
+        def blocker(name='blocker')
+            add_task(name: name)
         end
+
+        #
+        # @!endgroup
+        #
     end
 end

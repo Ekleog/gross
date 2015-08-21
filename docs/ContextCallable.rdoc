@@ -1,0 +1,15 @@
+= Context Callable
+
+A context callable is a callable that takes one argument, the context, usually noted +c+.
+
+All variables that have been set in a task the current {Gross::Task task} depends on are accessible.
+
+As an example, the following code would print +"This is a test"+:
+
+    g = Gross::Machine.new
+    g.set(:var, 'test')
+    g.print { |c| "This is a #{c.var}" }
+    g.run
+
+See also the documentation of {Gross::Machine#set} for more details on how variables can be set,
+and the documentation of the relevant modules for more details on which modules set which variables.

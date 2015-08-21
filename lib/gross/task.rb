@@ -18,36 +18,102 @@ require 'thread'
 require 'gross/message'
 
 module Gross
-private
+    #
+    # A task that can be ran by a {Machine machine}, and be backtracked or ask for backtracking
+    #
     class Task
+        #
+        # Constructs a {Task task}
+        #
+        # @param id             [Fixnum]            The task identifier, see also {#id}
+        # @param name           [String]            An human-readable task name, used for logging purposes
+        # @param machine_name   [String]            The machine name, used for logging purposes
+        # @param queue          [Queue<Message>]    A reference to the event queue of the
+        #   {Machine machine} to which this {Task task} is attached
+        # @param up             [#call]             A function to call so as to up the task
+        # @param down           [#call]             A function to call so as to take the task down
+        #
         def initialize(id, name, machine_name, queue, up, down)
-            @id = id        # Task ID
-            @name = name    # Human-readable task name
-            @machine_name = machine_name # Machine name
-            @queue = queue  # Pointer to the event queue in the Gross::Machine
+            @id = id
+            @name = name
+            @machine_name = machine_name
+            @queue = queue
             @status = :down # Status, among :down, :upping, :up and :downing
-            @up = up        # Up function
-            @down = down    # Down function
-            @deps = []      # List of task IDs this task depends on
-            @rdeps = []     # List of task IDs that depend on this task
+            @up = up
+            @down = down
+            @deps = []
+            @rdeps = []
             @thread = nil   # Thread running, if :upping or :downing ; nil otherwise
         end
 
-        attr_reader :id, :name, :deps, :rdeps
+        #
+        # Returns the task identifier
+        #
+        # This task identifier can be used to uniquely identify a {Task task} inside a {Machine machine}
+        #
+        # @return [Fixnum] The task identifier of this task
+        #
+        attr_reader :id
 
-        # Human-readable identifier
+        #
+        # Returns the human-readable task name
+        #
+        # @return [String] A human-readable task name
+        #
+        attr_reader :name
+
+        #
+        # Returns the list of task identifiers that this task depends upon
+        #
+        # @return [Array<Fixnum>] A list of all the task IDs this tasks depends on
+        #
+        attr_reader :deps
+
+        #
+        # Returns a list of all the task identifiers that depend upon this task
+        #
+        # @return [Array<Fixnum>] A list of all the task IDs that depend on this task
+        #
+        attr_reader :rdeps
+
+        #
+        # Returns a human-readable identifier that can be used for logging purposes
+        #
+        # It is composed like this: machine_name[task_id]
+        #
+        # @return [String] A human-readable identifier
+        #
         def hrid
             return "#{@machine_name}[#{@id}]"
         end
 
+        #
+        # Is the task currently up?
+        #
+        # @return [Boolean] Whether the task is currently up
+        #
         def up?
             return @status == :up
         end
 
+        #
+        # Has the task been upped?
+        #
+        # Returns +true+ if the task is currently up, or has started to be taken up
+        #
+        # @return [Boolean] Whether the task has been upped
+        #
         def upped?
             return @status == :upping || @status == :up
         end
 
+        #
+        # Take the task up
+        #
+        # Start the task in a new subprocess, then report completion as soon as task is up
+        #
+        # @return [void] Returns immediately, completion being notified through the +queue+ parameter to {#initialize}
+        #
         def up
             Gross::log.info "  UPPING[#{hrid}]: #{@name}"
             @status = :upping
@@ -64,6 +130,11 @@ private
             end
         end
 
+        #
+        # Take the task down
+        #
+        # @return [void] Returns as soon as task has been taken down
+        #
         def down
             Gross::log.info "  DOWNING[#{hrid}]: #{@name}"
             @status = :downing
@@ -76,16 +147,33 @@ private
             Gross::log.info "  DOWN[#{hrid}]: #{@name}"
         end
 
+        #
+        # Make this task depend on other task +task+
+        #
+        # This {Task task} will be brought up only after task +task+ is up, and as soon as task +task+
+        # will notify it is going down, this task will go down too.
+        #
+        # @param task [Task] The task this task is to depend on
+        #
+        # @return [self]
+        #
+        # @example Depend on multiple tasks
+        #   my_task << dependency_1 & dependency_2 & dependency_3
+        #
         def depends(task)
             @deps << task.id
             task.append_to_rdeps @id
             return self
         end
-
         alias_method :<<, :depends
         alias_method :&, :depends
 
     protected
+        #
+        # Helper method made for adding task id +id+ to +@rdeps+
+        #
+        # @param id [Fixnum] The id of the task that depends on +self+
+        #
         def append_to_rdeps(id)
             @rdeps << id
         end

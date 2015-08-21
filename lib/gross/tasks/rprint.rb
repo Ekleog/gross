@@ -16,6 +16,20 @@
 
 module Gross
     class Machine
+        #
+        # @!group Tasks::Debug
+        #
+
+        #
+        # Writes a message to stdout when task is brought down
+        #
+        # @overload rprint(message)
+        #   @param message [ContextCallable] Message to print as a {file:docs/ContextCallable.rdoc ContextCallable}
+        # @overload rprint(&block)
+        #   @param block [#call] Message to print as a {file:docs/ContextCallable.rdoc ContextCallable}
+        #
+        # @return [Task] A task that prints the message given as a parameter when being brought down
+        #
         def rprint(message='', &block)
             name = '{{ function }}'
             msg = message

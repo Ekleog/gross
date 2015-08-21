@@ -18,7 +18,20 @@ require 'ostruct'
 require 'gross/task'
 
 module Gross
+    #
+    # The machine that will run and backtrack the tasks.
+    #
+    # @example Simple Hello World machine
+    #   g = Gross::Machine.new
+    #   g.print 'Hello, World!'
+    #   g.run
+    #
     class Machine
+        #
+        # Initializes a machine with a given name
+        #
+        # @param name [String] The name of the machine, will be used in logs
+        #
         def initialize(name = 'MAIN')
             @tasks = []
             @context = OpenStruct.new
@@ -26,8 +39,25 @@ module Gross
             @name = name
         end
 
+        #
+        # Returns the command queue to this {Machine machine}
+        #
+        # Any {Message message} can be sent to the current {Machine machine}.
+        #
+        # @return [Queue<Message>] The command queue that can be used to send {Message messages} to the machine
+        # @see Message The documentation of Message, for a description of what can be sent on this queue
+        #
         attr_reader :queue
 
+        #
+        # Adds a {Task task} to be run
+        #
+        # @param name [String] The name of the task, will be used in logs
+        # @param up [#call] The function to call when the task should go up
+        # @param down [#call] The function to call when the task should go down
+        #
+        # @return [Task] The task just added
+        #
         def add_task(name: '', up: lambda {}, down: lambda {})
             id = @tasks.length
             Gross::log.debug (name ? "Adding task[#{@name}[#{id}]] #{name}" : "Adding unnamed task[#{@name}[#{id}]]")
@@ -36,6 +66,14 @@ module Gross
             return new_task
         end
 
+        #
+        # Runs the machine, backtracking when needed
+        #
+        # @param extqueue [Queue<Message>] The queue that will be used to output messages reporting when all the states
+        #   are up and when a state is going down, requiring possible backtracking of machines that depend on this one
+        #
+        # @return [void] Returns only when receives an exit message on its {#queue command queue}
+        #
         def run(extqueue = nil)
             Gross::log.info "Starting up machine '#{@name}'"
             @tasks.each do |t|
@@ -67,6 +105,13 @@ module Gross
         end
 
     private
+        #
+        # Takes down task +id+, after all its dependencies have been (recursively) taken down
+        #
+        # @param id [Fixnum] The +id+ of the task to take down, as returned by {Task#id +task.id+}
+        #
+        # @return [void] Returns when task has been taken down
+        #
         def down(id)
             Gross::log.info "Task[#{@name}[#{id}]] going down: #{@tasks[id].name}"
             @tasks[id].rdeps.each do |t|
@@ -76,10 +121,18 @@ module Gross
             Gross::log.info "Task[#{@name}[#{id}]] successfully backtracked: #{@tasks[id].name}"
         end
 
+
+        #
+        # Shortens message +msg+ if it is too long to properly fit a log line
+        #
+        # @param msg [String] The message to shorten
+        #
+        # @return [String] The message, clipped to a maximum of 50 characters
+        #
         def shorten(msg)
             msg = msg.to_s
             if msg.length > 50
-                return msg[0, 50] + '...'
+                return msg[0, 47] + '...'
             else
                 return msg
             end
