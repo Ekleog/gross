@@ -35,12 +35,12 @@ def run_block_until_up(g)
     queue = Queue.new
     thr = Thread.new { g.run queue }
     # Wait until machine is up
-    while queue.pop.type != :up; end
+    while queue.pop != :up; end
     return queue
 end
 
 def down_block_until_down(g, q, id)
     g.queue << Gross::Message.down(id)
     # Wait until down
-    while q.pop.type != :down; end
+    while q.pop != :down; end
 end

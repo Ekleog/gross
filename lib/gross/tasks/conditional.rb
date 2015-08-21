@@ -51,7 +51,7 @@ module Gross
                             machine = Machine.new "#{task.hrid}[#{name}]"
                             code.call machine
                             thread = Thread.new { machine.run queue }
-                            while queue.pop.type != :up; end
+                            while queue.pop != :up; end
                             break
                         end
                     end

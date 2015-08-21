@@ -69,7 +69,7 @@ module Gross
         #
         # Runs the machine, backtracking when needed
         #
-        # @param extqueue [Queue<Message>] The queue that will be used to output messages reporting when all the states
+        # @param extqueue [Queue<:up, :down>] The queue that will be used to output messages reporting when all the states
         #   are up and when a state is going down, requiring possible backtracking of machines that depend on this one
         #
         # @return [void] Returns only when receives an exit message on its {#queue command queue}
@@ -90,11 +90,11 @@ module Gross
                     end
                     if @tasks.all? { |t| t.up? }
                         Gross::log.info "All tasks up for machine '#{@name}'"
-                        extqueue << Message.up(0) unless extqueue == nil
+                        extqueue << :up unless extqueue == nil
                     end
                 when :down
                     down msg.id
-                    extqueue << Message.down(0) unless extqueue == nil
+                    extqueue << :down unless extqueue == nil
                 when :exit
                     @tasks.each_index { |id| down id if @tasks[id].upped? }
                     return
