@@ -31,13 +31,7 @@ module Gross
         # @return [Task] A task that prints the message given as a parameter when being brought up
         #
         def print(message='', &block)
-            name = '{{ function }}'
-            msg = message
-            if !msg.respond_to? :call
-                name = shorten msg
-                msg = ->(ctx) { message }
-            end
-            msg = block if block
+            name, msg = context_callable(message, &block)
             add_task(
                 name: "print '#{name}'",
                 up: lambda { $stdout.print(msg.call @context) }

@@ -1,6 +1,9 @@
 = Context Callable
 
 A context callable is a callable that takes one argument, the context, usually noted +c+.
+There is however an exception, made so as to simplify usage: a "context callable" does actually
+not have to be callable. It can also be a constant, in which case it is assumed equal to a
+callable constant to this value. The rest of this document will only deal with the "callable" case.
 
 All variables that have been set in a task the current {Gross::Task task} depends on are accessible.
 

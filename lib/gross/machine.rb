@@ -121,6 +121,24 @@ module Gross
             Gross::log.info "Task[#{@name}[#{id}]] successfully backtracked: #{@tasks[id].name}"
         end
 
+        #
+        # Returns a lambda taking a context and returning a value out of an (argument, block) pair
+        #
+        # @param argument [ContextCallable] A {file:docs/ContextCallable.rdoc ContextCallable}, or
+        # @param block [#call] A lambda that takes a context and returns a value
+        #
+        # @return [Array<(String, #call)>] A pair of a name and a lambda that takes a context and returns a value
+        #
+        def context_callable(argument, &block)
+            name = '{{ function }}'
+            arg = argument
+            if !arg.respond_to? :call
+                name = shorten arg
+                arg = ->(ctx) { argument }
+            end
+            arg = block if block
+            return [name, arg]
+        end
 
         #
         # Shortens message +msg+ if it is too long to properly fit a log line

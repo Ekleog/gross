@@ -27,19 +27,8 @@ module Gross
         # @param value [ContextCallable] Value of the variable, given as a {file:docs/ContextCallable.rdoc ContextCallable}
         #
         def set(variable, value)
-            varname = '{{ function }}'
-            var = variable
-            if !var.respond_to? :call
-                varname = shorten var
-                var = ->(ctx) { variable.to_s } if !var.respond_to? :call
-            end
-
-            valname = '{{ function }}'
-            val = value
-            if !val.respond_to? :call
-                valname = shorten val
-                val = ->(ctx) { value } if !val.respond_to? :call
-            end
+            varname, var = context_callable variable
+            valname, val = context_callable value
 
             add_task(
                 name: "set '#{varname}' := '#{valname}'",
