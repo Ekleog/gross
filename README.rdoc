@@ -1,4 +1,11 @@
-== Gross
+= Gross
+
+Gross is designed as a daemon for configuring network, but is actually much more
+powerful than that.
+
+== What is Gross?
+
+First of all, you do not have to understand this section in order to use gross.
 
 Gross was initially designed for network configuration. However, doing so turned
 out to be equivalent to implementing a light Domain Specific Language, entirely
@@ -12,3 +19,24 @@ runs it ; until it manages to initialize the previously failed command.
 
 This may sound hard to understand, but it is just under-the-hood management: you
 usually will just write declarative scripts and it will Just Work (TM).
+
+== Examples
+
+At the moment not enough tasks are implemented, so it is just a toy language,
+not yet suited for production use.
+
+So here is the usual Hello World:
+
+    g = Gross::Machine.new
+    g.print "Hello World!\n"
+    g.run
+
+And here is a (slightly) more contrived example:
+
+    g = Gross::Machine.new
+    g.set 'rand', ->(c) { rand(1..10) }
+    g.print { |c| "Random number between 1 and 10: #{c.rand}" }
+    g.run
+
+Of course this does not make any use of backtracking, which is the power feature
+of this language, given there is no external state yet to trigger backtracking.
