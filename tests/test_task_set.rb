@@ -44,7 +44,7 @@ class TestTaskSet < MiniTest::Test
     end
 
     def test_val_dict
-        g = Gross::Machine.new 'TestTaskSet::test_basic'
+        g = Gross::Machine.new 'TestTaskSet::test_val_dict'
         blk = g.blocker
         var = g.set('var', { key: 'test' }) << blk
         g.print{|c| "This is a #{c.var[:key]} upping"} << var
@@ -52,6 +52,19 @@ class TestTaskSet < MiniTest::Test
         q = nil
         assert_output("This is a test upping", '') { q = run_block_until_up g }
         assert_output("This is a test downing", '') { down_block_until_down(g, q, blk.id) }
+        g.queue << Gross::Message.exit
+    end
+
+    def test_val_block
+        g = Gross::Machine.new 'TestTaskSet::test_val_block'
+        blk = g.blocker
+        v = g.set('v', false) << blk
+        var = g.set('var') { |c| !c.v } << v
+        g.print{|c| "Is this working? #{c.var}"} << var
+        g.rprint{|c| "Is this still working? #{c.var}"} << var
+        q = nil
+        assert_output("Is this working? true", '') { q = run_block_until_up g }
+        assert_output("Is this still working? true", '') { down_block_until_down(g, q, blk.id) }
         g.queue << Gross::Message.exit
     end
 end

@@ -26,9 +26,9 @@ module Gross
         # @param variable [ContextCallable] Variable name, given as a {file:docs/ContextCallable.rdoc ContextCallable}
         # @param value [ContextCallable] Value of the variable, given as a {file:docs/ContextCallable.rdoc ContextCallable}
         #
-        def set(variable, value)
+        def set(variable, value='', &block)
             varname, var = context_callable variable
-            valname, val = context_callable value
+            valname, val = context_callable(value, &block)
 
             add_task(
                 name: "set '#{varname}' := '#{valname}'",
