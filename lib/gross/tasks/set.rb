@@ -32,8 +32,7 @@ module Gross
 
             add_task(
                 name: "set '#{varname}' := '#{valname}'",
-                up: lambda { @context[var.call @context] = val.call @context },
-                down: lambda { @context.delete_field var.call @context }
+                up: lambda { @context[var.call @context] = val.call @context }
             )
         end
     end
