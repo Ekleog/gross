@@ -15,6 +15,34 @@
 # along with gross.  If not, see <http://www.gnu.org/licenses/>.
 
 module Gross
+    class BlockerTask < Task
+        def initialize(id, name, machine)
+            super(id, name, machine, lambda {}, lambda {})
+        end
+
+        def set_down(machine=@machine)
+            return machine.add_task(
+                name: @name,
+                up:   lambda { @machine.queue << Message.down(@id) }
+            )
+        end
+
+        def set_up(machine=@machine)
+            return machine.add_task(
+                name: @name,
+                up:   lambda { @machine.queue << Message.up(@id) }
+            )
+        end
+
+        def downup(machine=@machine)
+            return machine.add_task(
+                name: @name,
+                up: lambda { @machine.queue << Message.downup(@id) }
+            )
+        end
+    end
+    private_constant :BlockerTask
+
     class Machine
         #
         # @!group Tasks
@@ -25,12 +53,14 @@ module Gross
         #
         # A blocker is a dummy task, whose only aim is to provide a backtrack point
         #
-        # @param name A human-readable name for the task
+        # @param name [String] A human-readable name for the task
         #
         # @return [Task] The created blocker task
         #
         def blocker(name='blocker')
-            add_task(name: name)
+            add_custom_task (lambda do |id, machine|
+                return BlockerTask.new(id, name, machine)
+            end)
         end
 
         #
