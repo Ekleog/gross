@@ -103,6 +103,10 @@ module Gross
                 t.up if @tasks[t.id].deps.empty?
             end
             while true
+                if @queue.empty? && @tasks.all? { |t| t.up? }
+                    Gross::log.info "All tasks up for machine '#{@name}'"
+                    extqueue << :up unless extqueue == nil
+                end
                 msg = @queue.pop
                 case msg.type
                 when :up
@@ -144,14 +148,9 @@ module Gross
         # @return [void]
         #
         def up(id, extqueue)
-            if @tasks.all? { |t| t.up? }
-                Gross::log.info "All tasks up for machine '#{@name}'"
-                extqueue << :up unless extqueue == nil
-            else
-                @tasks[id].rdeps.each do |rdep|
-                    if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
-                        @tasks[rdep].up unless @tasks[rdep].upped?
-                    end
+            @tasks[id].rdeps.each do |rdep|
+                if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
+                    @tasks[rdep].up unless @tasks[rdep].upped?
                 end
             end
         end
