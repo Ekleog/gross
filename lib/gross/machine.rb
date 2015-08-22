@@ -115,12 +115,15 @@ module Gross
                     down msg.id, extqueue
                     extqueue << :down_done
                 when :downup
+                    Gross::log.debug "Starting DOWNUP on '#{@name}'"
                     if @tasks.all? { |t| t.up? }
                         Gross::log.info "Some tasks down for machine '#{@name}'"
                         extqueue << :down unless extqueue == nil
                     end
                     down msg.id, extqueue
-                    up msg.id, extqueue
+                    Gross::log.debug "DOWN done, UP starting on '#{@name}'"
+                    @tasks[msg.id].up
+                    Gross::log.debug "Ending DOWNUP on '#{@name}'"
                 when :exit
                     @tasks.each_index { |id| down id, extqueue if @tasks[id].upped? }
                     Gross::log.info "Machine '#{@name}' exited"
@@ -185,7 +188,11 @@ module Gross
                 arg = ->(ctx) { argument }
             end
             arg = block if block
-            return [name, arg]
+            callback = lambda do |c|
+                Gross::log.debug "    Calling ContextCallable with context: #{c}"
+                arg.call c
+            end
+            return [name, callback]
         end
 
         #
