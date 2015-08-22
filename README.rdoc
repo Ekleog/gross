@@ -34,8 +34,8 @@ So here is the usual Hello World:
 And here is a (slightly) more contrived example:
 
     g = Gross::Machine.new
-    g.set 'rand', ->(c) { rand(1..10) }
-    g.print { |c| "Random number between 1 and 10: #{c.rand}" }
+    var = g.set 'rand', ->(c) { rand(1..10) }
+    g.print { |c| "Random number between 1 and 10: #{c.rand}" } << var
     g.run
 
 Of course this does not make any use of backtracking, which is the power feature
