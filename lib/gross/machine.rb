@@ -83,9 +83,9 @@ module Gross
         #
         # @return [Task] The task just added
         #
-        def add_task(name: '', up: lambda {}, down: lambda {})
+        def add_task(name: '', up: lambda {}, down: lambda {}, instant: false)
             add_custom_task (lambda do |id, machine|
-                return Task.new(id, name, machine, up, down)
+                return Task.new(id, name, machine, instant, up, down)
             end)
         end
 

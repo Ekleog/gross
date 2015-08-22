@@ -17,7 +17,7 @@
 module Gross
     class BlockerTask < Task
         def initialize(id, name, machine)
-            super(id, name, machine, lambda {}, lambda {})
+            super(id, name, machine, true, lambda {}, lambda {})
         end
 
         def set_down(machine=@machine)

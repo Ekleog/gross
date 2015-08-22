@@ -32,6 +32,7 @@ module Gross
 
             add_task(
                 name: "set '#{varname}' := '#{valname}'",
+                instant: true,
                 up: lambda { @context[var.call @context] = val.call @context }
             )
         end

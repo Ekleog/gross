@@ -34,6 +34,7 @@ module Gross
             name, msg = context_callable(message, &block)
             add_task(
                 name: "print '#{name}'",
+                instant: true,
                 up: lambda { $stdout.print(msg.call @context) }
             )
         end

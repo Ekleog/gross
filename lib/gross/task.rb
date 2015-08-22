@@ -29,14 +29,17 @@ module Gross
         # @param name           [String]            An human-readable task name, used for logging purposes
         # @param machine        [Machine]           The parent machine
         #   {Machine machine} to which this {Task task} is attached
+        # @param instant        [Boolean]           If true, then it is assumed the up and down function are
+        #   instantaneous, and they will not be run in another thread
         # @param up             [#call]             A function to call so as to up the task
         # @param down           [#call]             A function to call so as to take the task down
         #
-        def initialize(id, name, machine, up, down)
+        def initialize(id, name, machine, instant, up, down)
             @id = id
             @name = name
             @machine = machine
             @status = :down # Status, among :down, :upping, :up and :downing
+            @instant = instant
             @up = up
             @down = down
             @deps = []
@@ -115,16 +118,10 @@ module Gross
         def up
             Gross::log.info "  UPPING[#{hrid}]: #{@name}"
             @status = :upping
-            @thread = Thread.new do
-                begin
-                    @up.call
-                    @status = :up
-                    Gross::log.info "  UP[#{hrid}]: #{@name}"
-                    @machine.queue << Message.up(@id)
-                rescue => e
-                    # Logger is thread-safe
-                    Gross::log.error "Error while upping[#{hrid}] #{@name}: #{e}"
-                end
+            if @instant
+                instant_up
+            else
+                @thread = Thread.new { instant_up }
             end
         end
 
@@ -174,6 +171,23 @@ module Gross
         #
         def append_to_rdeps(id)
             @rdeps << id
+        end
+
+    private
+
+        #
+        # Take the task up, instantly
+        #
+        def instant_up
+            begin
+                @up.call
+                @status = :up
+                Gross::log.info "  UP[#{hrid}]: #{@name}"
+                @machine.queue << Message.up(@id)
+            rescue => e
+                # Logger is thread-safe
+                Gross::log.error "Error while upping[#{hrid}] #{@name}: #{e}"
+            end
         end
     end
 end
