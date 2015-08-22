@@ -43,7 +43,7 @@ module Gross
             task = add_task(
                 name: name,
                 up:   lambda do
-                    machine = Machine.new "#{task.hrid}[#{name}]"
+                    machine = Machine.new "#{task.hrid}[#{name}]", @context
                     v = value.call @context
                     if dict.has_key? v
                         dict[v].call machine

@@ -31,10 +31,11 @@ module Gross
         # Initializes a machine with a given name
         #
         # @param name [String] The name of the machine, will be used in logs
+        # @param context [OpenStruct] The variables that should be available
         #
-        def initialize(name = 'MAIN')
+        def initialize(name = 'MAIN', context = OpenStruct.new)
             @tasks = []
-            @context = OpenStruct.new
+            @context = context
             @queue = Queue.new
             @name = name
         end

@@ -83,4 +83,24 @@ class TestTaskConditional < MiniTest::Test
         assert_output('WELL DONE', '') { down_block_until_down(g, q, blk.id) }
         g.queue << Gross::Message.exit
     end
+
+    def test_pass_context_inside
+        g = Gross::Machine.new 'TestTaskConditional::test_pass_context_inside'
+        blk = g.blocker
+        var = g.set('cond', true) << blk
+        g.conditional([
+            ['true', lambda { |c| c.cond }, lambda do |h|
+                h.print { |c| "WORKS? #{c.cond}" }
+                h.rprint { |c| "WORKS? #{c.cond}" }
+            end],
+            ['default', lambda { |c| true }, lambda do |h|
+                h.print 'DOESN\'T WORK'
+                h.rprint 'DOESN\'T WORK'
+            end]
+        ]) << var
+        q = nil
+        assert_output('WORKS? true', '') { q = run_block_until_up g }
+        assert_output('WORKS? true', '') { down_block_until_down(g, q, blk.id) }
+        g.queue << Gross::Message.exit
+    end
 end

@@ -29,6 +29,10 @@ class TestTaskCase < MiniTest::Test
         1337 => lambda do |h|
             h.print 'DOESN\'T WORK'
             h.rprint 'DOESN\'T WORK'
+        end,
+        6 => lambda do |h|
+            h.print { |c| "Value: #{c.var}" }
+            h.rprint { |c| "Value: #{c.var}" }
         end
         }, lambda do |h|
             h.print 'WORKS'
@@ -46,5 +50,9 @@ class TestTaskCase < MiniTest::Test
 
     def test_not_in_it
         do_test 'test_not_in_it', 9, 'WORKS'
+    end
+
+    def test_pass_context
+        do_test 'test_pass_context', 1, 'Value: 1'
     end
 end

@@ -48,7 +48,7 @@ module Gross
                 up:   lambda do
                     args.each do |name, cond, code|
                         if cond.call @context
-                            machine = Machine.new "#{task.hrid}[#{name}]"
+                            machine = Machine.new "#{task.hrid}[#{name}]", @context
                             code.call machine
                             thread = Thread.new { machine.run queue }
                             while queue.pop != :up; end
