@@ -27,17 +27,15 @@ module Gross
         #
         # @param id             [Fixnum]            The task identifier, see also {#id}
         # @param name           [String]            An human-readable task name, used for logging purposes
-        # @param machine_name   [String]            The machine name, used for logging purposes
-        # @param queue          [Queue<Message>]    A reference to the event queue of the
+        # @param machine        [Machine]           The parent machine
         #   {Machine machine} to which this {Task task} is attached
         # @param up             [#call]             A function to call so as to up the task
         # @param down           [#call]             A function to call so as to take the task down
         #
-        def initialize(id, name, machine_name, queue, up, down)
+        def initialize(id, name, machine, up, down)
             @id = id
             @name = name
-            @machine_name = machine_name
-            @queue = queue
+            @machine = machine
             @status = :down # Status, among :down, :upping, :up and :downing
             @up = up
             @down = down
@@ -84,7 +82,7 @@ module Gross
         # @return [String] A human-readable identifier
         #
         def hrid
-            return "#{@machine_name}[#{@id}]"
+            return "#{@machine.name}[#{@id}]"
         end
 
         #
@@ -122,7 +120,7 @@ module Gross
                     @up.call
                     @status = :up
                     Gross::log.info "  UP[#{hrid}]: #{@name}"
-                    @queue << Message.up(@id)
+                    @machine.queue << Message.up(@id)
                 rescue => e
                     # Logger is thread-safe
                     Gross::log.error "Error while upping[#{hrid}] #{@name}: #{e}"

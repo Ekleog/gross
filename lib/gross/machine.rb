@@ -40,6 +40,15 @@ module Gross
         end
 
         #
+        # Returns the name of this machine
+        #
+        # This name should only be used for logging purposes, it is not at all supposed to be unique
+        #
+        # @return [String] The name of this machine
+        #
+        attr_reader :name
+
+        #
         # Returns the command queue to this {Machine machine}
         #
         # Any {Message message} can be sent to the current {Machine machine}.
@@ -52,6 +61,21 @@ module Gross
         #
         # Adds a {Task task} to be run
         #
+        # @param block [#call] A function that takes a task ID, machine name and command queue as
+        # parameters, and returns the task to be added
+        #
+        # @return [Task] The task just added
+        #
+        def add_custom_task(block)
+            new_task = block.call @tasks.length, self
+            Gross::log.debug "Adding task[#{new_task.hrid}]: #{new_task.name}"
+            @tasks << new_task
+            return new_task
+        end
+
+        #
+        # Adds a {Task task} to be run
+        #
         # @param name [String] The name of the task, will be used in logs
         # @param up [#call] The function to call when the task should go up
         # @param down [#call] The function to call when the task should go down
@@ -59,11 +83,9 @@ module Gross
         # @return [Task] The task just added
         #
         def add_task(name: '', up: lambda {}, down: lambda {})
-            id = @tasks.length
-            Gross::log.debug (name ? "Adding task[#{@name}[#{id}]] #{name}" : "Adding unnamed task[#{@name}[#{id}]]")
-            new_task = Task.new(id, name, @name, @queue, up, down)
-            @tasks << new_task
-            return new_task
+            add_custom_task (lambda do |id, machine|
+                return Task.new(id, name, machine, up, down)
+            end)
         end
 
         #
