@@ -36,4 +36,11 @@ class TestTaskPrint < MiniTest::Test
     def test_long
         do_test 'A' * 10000
     end
+
+    def test_as_block
+        g = Gross::Machine.new 'TestTaskPrint::test_as_block'
+        g.print { |c| 'Test' }
+        assert_output('Test', '') { run_block_until_up g }
+        g.queue << Gross::Message.exit
+    end
 end
