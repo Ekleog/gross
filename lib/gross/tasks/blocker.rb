@@ -22,21 +22,21 @@ module Gross
 
         def set_down(machine=@machine)
             return machine.add_task(
-                name: @name,
+                name: "#{@name} downer",
                 up:   lambda { @machine.queue << Message.down(@id) }
             )
         end
 
         def set_up(machine=@machine)
             return machine.add_task(
-                name: @name,
+                name: "#{@name} upper",
                 up:   lambda { @machine.queue << Message.up(@id) }
             )
         end
 
         def downup(machine=@machine)
             return machine.add_task(
-                name: @name,
+                name: "#{@name} downupper",
                 up: lambda { @machine.queue << Message.downup(@id) }
             )
         end
