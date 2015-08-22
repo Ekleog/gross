@@ -92,7 +92,7 @@ module Gross
         #
         # Runs the machine, backtracking when needed
         #
-        # @param extqueue [Queue<:up, :down>] The queue that will be used to output messages reporting when all the states
+        # @param extqueue [Queue<:up, :down, :down_done>] The queue that will be used to output messages reporting when all the states
         #   are up and when a state is going down, requiring possible backtracking of machines that depend on this one
         #
         # @return [void] Returns only when receives an exit message on its {#queue command queue}
@@ -106,20 +106,24 @@ module Gross
                 msg = @queue.pop
                 case msg.type
                 when :up
-                    @tasks[msg.id].rdeps.each do |rdep|
-                        if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
-                            @tasks[rdep].up unless @tasks[rdep].upped?
-                        end
-                    end
-                    if @tasks.all? { |t| t.up? }
-                        Gross::log.info "All tasks up for machine '#{@name}'"
-                        extqueue << :up unless extqueue == nil
-                    end
+                    up msg.id, extqueue
                 when :down
-                    down msg.id
-                    extqueue << :down unless extqueue == nil
+                    if @tasks.all? { |t| t.up? }
+                        Gross::log.info "Some tasks down for machine '#{@name}'"
+                        extqueue << :down unless extqueue == nil
+                    end
+                    down msg.id, extqueue
+                    extqueue << :down_done
+                when :downup
+                    if @tasks.all? { |t| t.up? }
+                        Gross::log.info "Some tasks down for machine '#{@name}'"
+                        extqueue << :down unless extqueue == nil
+                    end
+                    down msg.id, extqueue
+                    up msg.id, extqueue
                 when :exit
-                    @tasks.each_index { |id| down id if @tasks[id].upped? }
+                    @tasks.each_index { |id| down id, extqueue if @tasks[id].upped? }
+                    Gross::log.info "Machine '#{@name}' exited"
                     return
                 else
                     Gross::log.error "Machine '#{@name}' received invalid message: #{msg}"
@@ -129,16 +133,37 @@ module Gross
 
     private
         #
+        # Starts up all reverse dependencies of task +id+ that coule be started up,
+        # assuming task +id+ has just been started up
+        #
+        # @param id [Fixnum] The +id+ of the task whose rdeps should be upped, as returned by {Task#id +task.id+}
+        #
+        # @return [void]
+        #
+        def up(id, extqueue)
+            if @tasks.all? { |t| t.up? }
+                Gross::log.info "All tasks up for machine '#{@name}'"
+                extqueue << :up unless extqueue == nil
+            else
+                @tasks[id].rdeps.each do |rdep|
+                    if @tasks[rdep].deps.all? { |dep| @tasks[dep].up? }
+                        @tasks[rdep].up unless @tasks[rdep].upped?
+                    end
+                end
+            end
+        end
+
+        #
         # Takes down task +id+, after all its dependencies have been (recursively) taken down
         #
         # @param id [Fixnum] The +id+ of the task to take down, as returned by {Task#id +task.id+}
         #
         # @return [void] Returns when task has been taken down
         #
-        def down(id)
+        def down(id, extqueue)
             Gross::log.info "Task[#{@name}[#{id}]] going down: #{@tasks[id].name}"
             @tasks[id].rdeps.each do |t|
-                down t if @tasks[t].up?
+                down t, extqueue if @tasks[t].up?
             end
             @tasks[id].down
             Gross::log.info "Task[#{@name}[#{id}]] successfully backtracked: #{@tasks[id].name}"

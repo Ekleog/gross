@@ -36,6 +36,7 @@ module Gross
         # Possible values are:
         # [+:up+]   {Task} {#id} just finished upping
         # [+:down+] {Task} {#id} should be downed with all of its dependencies
+        # [+:downup+] {Task} {#id} is restarting, so it should be downed and upped just after
         # [+:exit+] All tasks should be downed, and the {Machine machine} should be taken down
         #
         # @return [:up, :down, :exit] The type of the message
@@ -74,6 +75,16 @@ module Gross
         #
         def self.down(id)
             return new(:down, { id: id })
+        end
+
+        #
+        # Creates a {Message message} reporting task +id+ is restarting, that is going down and then
+        # up immediately after
+        #
+        # @return [Message] A message that states task +id+ is restarting
+        #
+        def self.downup(id)
+            return new(:downup, { id: id })
         end
 
         #

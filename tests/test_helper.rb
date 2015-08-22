@@ -42,5 +42,5 @@ end
 def down_block_until_down(g, q, id)
     g.queue << Gross::Message.down(id)
     # Wait until down
-    while q.pop != :down; end
+    while q.pop != :down_done; end
 end
