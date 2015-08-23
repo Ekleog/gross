@@ -165,7 +165,7 @@ module Gross
         def down(id, extqueue)
             Gross::log.info "Task[#{@name}[#{id}]] going down: #{@tasks[id].name}"
             @tasks[id].rdeps.each do |t|
-                down t, extqueue if @tasks[t].up?
+                down t, extqueue if @tasks[t].upped?
             end
             @tasks[id].down
             Gross::log.info "Task[#{@name}[#{id}]] successfully backtracked: #{@tasks[id].name}"
